@@ -20,7 +20,7 @@ const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
 const paint = (text) =>
   esc(text)
     .replace(/^slopsieve ([\d.]+)/m, '<span class="big">slopsieve $1</span>')
-    .replace(/SLOP SCORE: (\d+)\/100 - (\w+)/g, '<span class="score">SLOP SCORE: $1/100 - $2</span>')
+    .replace(/SLOP SCORE: (\d+)\/100 - (\w+)/g, (_m, s, b) => `<span class="${b === "LOW" ? "ok" : "score"}">SLOP SCORE: ${s}/100 - ${b}</span>`)
     .replace(/^(FLAGS|CLEAN|verdict:.*)$/gm, '<span class="big">$1</span>')
     .replace(/\[(\s*\d+)\]/g, '<span class="wt">[$1]</span>')
     .replace(/^      (?!\s*$)(.+)$/gm, '<span class="dim">      $1</span>')
@@ -42,6 +42,7 @@ const html = `<!DOCTYPE html>
   .p { color: #79c0ff; } .dim { color: #7d8590; }
   .big { color: #79c0ff; font-weight: 700; }
   .score { color: #f85149; font-weight: 700; }
+  .ok { color: #3fb950; font-weight: 700; }
   .wt { color: #f85149; font-weight: 600; }
 </style>
 </head>
