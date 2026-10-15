@@ -1,0 +1,41 @@
+{
+  "name": "slopsieve",
+  "version": "0.1.0",
+  "description": "Score a diff or PR for AI-slop review signals: test weakening, debug leftovers, trivial deps, dead code, narration comments. A linter for unreviewed generation.",
+  "type": "module",
+  "bin": {
+    "slopsieve": "bin/slopsieve.js"
+  },
+  "files": [
+    "bin",
+    "src"
+  ],
+  "scripts": {
+    "test": "node test/check.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "code-review",
+    "pull-request",
+    "ai-slop",
+    "lint",
+    "diff",
+    "code-quality",
+    "ai-agents",
+    "vibe-coding",
+    "review",
+    "ci"
+  ],
+  "author": "Prince Jain <princejain756@gmail.com> (https://github.com/princejain756)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/princejain756/slopsieve.git"
+  },
+  "homepage": "https://github.com/princejain756/slopsieve#readme",
+  "bugs": {
+    "url": "https://github.com/princejain756/slopsieve/issues"
+  }
+}

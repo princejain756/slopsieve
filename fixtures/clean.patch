@@ -1,0 +1,37 @@
+diff --git a/src/cart.js b/src/cart.js
+index 111aaaa..666ffff 100644
+--- a/src/cart.js
++++ b/src/cart.js
+@@ -10,8 +10,11 @@ const router = Router();
+ router.post("/add", async (req, res) => {
+   const { sku, qty } = req.body;
+-  if (!sku || qty == null) {
+-    return res.status(400).json({ error: "missing sku or qty" });
++  if (!sku || typeof qty !== "number" || !Number.isInteger(qty)) {
++    return res.status(400).json({ error: "sku required, qty must be an integer" });
++  }
++  if (qty <= 0 || qty > 999) {
++    return res.status(400).json({ error: "qty must be between 1 and 999" });
+   }
+   await db.query("INSERT INTO cart(sku, qty) VALUES($1, $2)", [sku, qty]);
+   res.json({ ok: true });
+diff --git a/tests/cart.test.js b/tests/cart.test.js
+index 444dddd..777gggg 100644
+--- a/tests/cart.test.js
++++ b/tests/cart.test.js
+@@ -30,4 +30,16 @@ describe("cart", () => {
+     expect(res.body.error).toMatch(/qty/i);
+   });
+ 
++  it("rejects non-integer quantity", async () => {
++    const res = await request(app).post("/cart/add").send({ sku: "A1", qty: 1.5 });
++    expect(res.status).toBe(400);
++    expect(res.body.error).toMatch(/integer/i);
++  });
++
++  it("rejects quantity above 999", async () => {
++    const res = await request(app).post("/cart/add").send({ sku: "A1", qty: 1000 });
++    expect(res.status).toBe(400);
++    expect(res.body.error).toMatch(/between 1 and 999/i);
++  });
+ });

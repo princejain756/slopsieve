@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  body { margin: 0; background: #0b0e14; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: "SF Mono", Menlo, monospace; }
+  .term { width: 1000px; margin: 40px; border-radius: 12px; overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,.6); background: #0d1117; border: 1px solid #21262d; }
+  .bar { display: flex; gap: 8px; padding: 14px 16px; background: #161b22; border-bottom: 1px solid #21262d; align-items: center; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .r { background: #ff5f57; } .y { background: #febc2e; } .g { background: #28c840; }
+  .title { margin-left: 12px; color: #7d8590; font-size: 13px; }
+  pre { margin: 0; padding: 26px 32px 32px; font-size: 15.5px; line-height: 1.55; color: #c9d1d9; white-space: pre-wrap; }
+  .p { color: #79c0ff; } .dim { color: #7d8590; }
+  .big { color: #79c0ff; font-weight: 700; }
+  .score { color: #f85149; font-weight: 700; }
+  .wt { color: #f85149; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="term">
+  <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="title">zsh</span></div>
+<pre><span class="p">$</span> npx slopsieve fixtures/slop.patch
+<span class="big">slopsieve 0.1.0</span> · fixtures/slop.patch · 2026-10-15
+<span class="dim">════════════════════════════════════════════════════════</span>
+<span class="score">SLOP SCORE: 100/100 - ALARM</span>
+<span class="dim">4 files · +37 -8 lines</span>
+
+<span class="big">FLAGS</span>
+  <span class="wt">[30]</span> test weakening
+<span class="dim">      tests/cart.test.js:24 it.skip("rejects negative quantity", async () => {</span>
+<span class="dim">      tests/cart.test.js: 4 more assertion lines removed than added</span>
+  <span class="wt">[25]</span> debug leftovers
+<span class="dim">      src/cart.js:25 console.log("checking qty", qty);</span>
+  <span class="wt">[20]</span> empty catch/except
+<span class="dim">      src/utils.js:12 } catch (e) {}</span>
+  <span class="wt">[20]</span> dependency added for trivial use
+<span class="dim">      package.json:17 adds 'is-odd'</span>
+  <span class="wt">[15]</span> commented-out code shipped (3 commented-out lines)
+<span class="dim">      src/cart.js:34 // for (const it of items) {</span>
+<span class="dim">      src/cart.js:35 //   if (it.price &lt; 0) throw new Error("neg");</span>
+<span class="dim">      src/cart.js:36 // }</span>
+  <span class="wt">[10]</span> narration comments (6 narration comments)
+<span class="dim">      src/cart.js:22 // This function checks whether the quantity is odd</span>
+<span class="dim">      src/cart.js:24 // Here we use the is-odd library to check oddness</span>
+<span class="dim">      src/cart.js:29 // This function validates the cart items</span>
+<span class="dim">      src/cart.js:31 // Ensure that the items array is not empty</span>
+  <span class="wt">[10]</span> exported but unreferenced
+<span class="dim">      src/cart.js:23 'isQuantityOdd' is exported but referenced nowhere in this diff</span>
+<span class="dim">      src/cart.js:30 'validateCartUnused' is exported but referenced nowhere in this diff</span>
+<span class="dim">      src/utils.js:4 'formatPrice' is exported but referenced nowhere in this diff</span>
+  <span class="wt">[ 5]</span> vague util sprawl
+<span class="dim">      src/utils.js created (generic name, catch-all destination)</span>
+
+<span class="big">CLEAN</span>
+  test file deleted · whitespace-only churn · oversized diff · no linked context
+
+<span class="big">verdict: 100/100 - strong unreviewed-generation signals - likely reject</span>
+
+<span class="p">$</span> git show HEAD | slopsieve --fail-at 60
+<span class="big">slopsieve 0.1.0</span> · fixtures/clean.patch · 2026-10-15
+<span class="dim">════════════════════════════════════════════════════════</span>
+<span class="score">SLOP SCORE: 0/100 - LOW</span>
+<span class="dim">2 files · +16 -2 lines</span>
+
+<span class="big">CLEAN</span>
+  debug leftovers · test weakening · test file deleted · empty catch/except · commented-out code shipped · narration comments · dependency added for trivial use · exported but unreferenced · whitespace-only churn · oversized diff · vague util sprawl · no linked context
+
+<span class="big">verdict: 0/100 - low slop signal - looks reviewable</span>
+<span class="dim">  exit 0 - would pass a CI gate</span>
+<span class="p">$</span> <span class="dim">|</span></pre>
+</div>
+</body>
+</html>
