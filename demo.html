@@ -21,50 +21,46 @@
 <div class="term">
   <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="title">zsh</span></div>
 <pre><span class="p">$</span> npx slopsieve fixtures/slop.patch
-<span class="big">slopsieve 0.1.0</span> · fixtures/slop.patch · 2026-10-15
+<span class="big">slopsieve 0.2.0</span> · fixtures/slop.patch · 2026-10-15
 <span class="dim">════════════════════════════════════════════════════════</span>
 <span class="score">SLOP SCORE: 100/100 - ALARM</span>
-<span class="dim">4 files · +37 -8 lines</span>
+<span class="dim">3 files · +37 -9 lines</span>
 
 <span class="big">FLAGS</span>
-  <span class="wt">[30]</span> test weakening
+  <span class="wt">[32]</span> test weakening
 <span class="dim">      tests/cart.test.js:24 it.skip("rejects negative quantity", async () => {</span>
 <span class="dim">      tests/cart.test.js: 4 more assertion lines removed than added</span>
   <span class="wt">[25]</span> debug leftovers
 <span class="dim">      src/cart.js:25 console.log("checking qty", qty);</span>
+  <span class="wt">[20]</span> import of missing local file
+<span class="dim">      src/cart.js:2 imports './db.js' - not found on disk or in this diff</span>
   <span class="wt">[20]</span> empty catch/except
-<span class="dim">      src/utils.js:12 } catch (e) {}</span>
+<span class="dim">      src/cart.js:12 } catch (e) {}</span>
   <span class="wt">[20]</span> dependency added for trivial use
 <span class="dim">      package.json:17 adds 'is-odd'</span>
-  <span class="wt">[15]</span> commented-out code shipped (3 commented-out lines)
+  <span class="wt">[19]</span> commented-out code shipped (3 commented-out lines)
 <span class="dim">      src/cart.js:34 // for (const it of items) {</span>
 <span class="dim">      src/cart.js:35 //   if (it.price &lt; 0) throw new Error("neg");</span>
 <span class="dim">      src/cart.js:36 // }</span>
-  <span class="wt">[10]</span> narration comments (6 narration comments)
+  <span class="wt">[15]</span> narration comments (6 narration comments)
 <span class="dim">      src/cart.js:22 // This function checks whether the quantity is odd</span>
 <span class="dim">      src/cart.js:24 // Here we use the is-odd library to check oddness</span>
 <span class="dim">      src/cart.js:29 // This function validates the cart items</span>
 <span class="dim">      src/cart.js:31 // Ensure that the items array is not empty</span>
-  <span class="wt">[10]</span> exported but unreferenced
-<span class="dim">      src/cart.js:23 'isQuantityOdd' is exported but referenced nowhere in this diff</span>
-<span class="dim">      src/cart.js:30 'validateCartUnused' is exported but referenced nowhere in this diff</span>
-<span class="dim">      src/utils.js:4 'formatPrice' is exported but referenced nowhere in this diff</span>
-  <span class="wt">[ 5]</span> vague util sprawl
-<span class="dim">      src/utils.js created (generic name, catch-all destination)</span>
 
 <span class="big">CLEAN</span>
-  test file deleted · whitespace-only churn · oversized diff · no linked context
+  possible secret committed · test file deleted · feature code, zero test changes · exported but unreferenced · whitespace-only churn · oversized diff · vague util sprawl · no linked context
 
 <span class="big">verdict: 100/100 - strong unreviewed-generation signals - likely reject</span>
 
 <span class="p">$</span> git show HEAD | slopsieve --fail-at 60
-<span class="big">slopsieve 0.1.0</span> · fixtures/clean.patch · 2026-10-15
+<span class="big">slopsieve 0.2.0</span> · fixtures/clean.patch · 2026-10-15
 <span class="dim">════════════════════════════════════════════════════════</span>
 <span class="ok">SLOP SCORE: 0/100 - LOW</span>
 <span class="dim">2 files · +16 -2 lines</span>
 
 <span class="big">CLEAN</span>
-  debug leftovers · test weakening · test file deleted · empty catch/except · commented-out code shipped · narration comments · dependency added for trivial use · exported but unreferenced · whitespace-only churn · oversized diff · vague util sprawl · no linked context
+  possible secret committed · test weakening · debug leftovers · test file deleted · import of missing local file · empty catch/except · dependency added for trivial use · feature code, zero test changes · commented-out code shipped · narration comments · exported but unreferenced · whitespace-only churn · oversized diff · vague util sprawl · no linked context
 
 <span class="big">verdict: 0/100 - low slop signal - looks reviewable</span>
 <span class="dim">  exit 0 - would pass a CI gate</span>
