@@ -59,4 +59,34 @@ ${paint(clean)}<span class="dim">  exit 0 - would pass a CI gate</span>
 </html>
 `;
 writeFileSync(join(root, "demo.html"), html);
-console.log("demo.html regenerated from live runs");
+
+// social card: 1280x640, same real output re-flowed so it fits landscape
+const flagLines = slop.split("\n").filter((l) => /^\s+\[\s*\d+\]/.test(l)).map((l) => l.trim());
+const score = slop.match(/SLOP SCORE: (\d+)\/100 - (\w+)/);
+const verdict = slop.match(/verdict: (.+)/)?.[1] || "";
+const social = `<!DOCTYPE html>
+<html><head><meta charset="utf-8"><style>
+  body { margin: 0; width: 1280px; height: 640px; background: #0b0e14; display: flex; font-family: "SF Mono", Menlo, monospace; overflow: hidden; }
+  .left { width: 62%; padding: 44px 40px; border-right: 1px solid #21262d; background: #0d1117; display: flex; flex-direction: column; justify-content: center; }
+  .cmd { color: #79c0ff; font-size: 20px; margin-bottom: 22px; }
+  .flag { color: #c9d1d9; font-size: 20px; line-height: 1.9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .flag b { color: #f85149; font-weight: 600; margin-right: 10px; }
+  .right { width: 38%; padding: 52px 44px; display: flex; flex-direction: column; justify-content: center; }
+  .name { color: #79c0ff; font-size: 44px; font-weight: 700; margin-bottom: 18px; }
+  .tag { color: #7d8590; font-size: 21px; line-height: 1.5; margin-bottom: 34px; }
+  .score { color: #f85149; font-size: 40px; font-weight: 700; }
+  .verdict { color: #7d8590; font-size: 17px; margin-top: 14px; line-height: 1.5; }
+</style></head><body>
+<div class="left">
+  <div class="cmd">$ npx slopsieve your-org/repo#128</div>
+  ${flagLines.map((l) => `<div class="flag"><b>${esc(l.match(/^\[\s*\d+\]/)[0])}</b>${esc(l.replace(/^\[\s*\d+\]\s*/, ""))}</div>`).join("\n  ")}
+</div>
+<div class="right">
+  <div class="name">slopsieve</div>
+  <div class="tag">Score a diff or PR for AI-slop review signals, before a human wastes time on it.</div>
+  <div class="score">${score[1]}/100 - ${score[2]}</div>
+  <div class="verdict">${esc(verdict)}</div>
+</div>
+</body></html>`;
+writeFileSync(join(root, "social.html"), social);
+console.log("demo.html + social.html regenerated from live runs");

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><style>
+  body { margin: 0; width: 1280px; height: 640px; background: #0b0e14; display: flex; font-family: "SF Mono", Menlo, monospace; overflow: hidden; }
+  .left { width: 62%; padding: 44px 40px; border-right: 1px solid #21262d; background: #0d1117; display: flex; flex-direction: column; justify-content: center; }
+  .cmd { color: #79c0ff; font-size: 20px; margin-bottom: 22px; }
+  .flag { color: #c9d1d9; font-size: 20px; line-height: 1.9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .flag b { color: #f85149; font-weight: 600; margin-right: 10px; }
+  .right { width: 38%; padding: 52px 44px; display: flex; flex-direction: column; justify-content: center; }
+  .name { color: #79c0ff; font-size: 44px; font-weight: 700; margin-bottom: 18px; }
+  .tag { color: #7d8590; font-size: 21px; line-height: 1.5; margin-bottom: 34px; }
+  .score { color: #f85149; font-size: 40px; font-weight: 700; }
+  .verdict { color: #7d8590; font-size: 17px; margin-top: 14px; line-height: 1.5; }
+</style></head><body>
+<div class="left">
+  <div class="cmd">$ npx slopsieve your-org/repo#128</div>
+  <div class="flag"><b>[30]</b>test weakening</div>
+  <div class="flag"><b>[25]</b>debug leftovers</div>
+  <div class="flag"><b>[20]</b>empty catch/except</div>
+  <div class="flag"><b>[20]</b>dependency added for trivial use</div>
+  <div class="flag"><b>[15]</b>commented-out code shipped (3 commented-out lines)</div>
+  <div class="flag"><b>[10]</b>narration comments (6 narration comments)</div>
+  <div class="flag"><b>[10]</b>exported but unreferenced</div>
+  <div class="flag"><b>[ 5]</b>vague util sprawl</div>
+</div>
+<div class="right">
+  <div class="name">slopsieve</div>
+  <div class="tag">Score a diff or PR for AI-slop review signals, before a human wastes time on it.</div>
+  <div class="score">100/100 - ALARM</div>
+  <div class="verdict">100/100 - strong unreviewed-generation signals - likely reject</div>
+</div>
+</body></html>
