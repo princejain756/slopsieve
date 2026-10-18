@@ -1,6 +1,6 @@
 {
   "name": "slopsieve",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Score a diff or PR for AI-slop review signals: test weakening, debug leftovers, trivial deps, dead code, narration comments. A linter for unreviewed generation.",
   "type": "module",
   "bin": {

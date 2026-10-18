@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 import { readFileSync, existsSync } from "node:fs";
 import { execFileSync } from "node:child_process";
-import { join } from "node:path";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import { parseDiff } from "../src/parse.js";
 import { analyze } from "../src/checks.js";
 import { textReport, jsonReport, githubReport } from "../src/report.js";
 
-const VERSION = "0.2.0";
+const VERSION = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), "..", "package.json"), "utf8")).version;
 
 const HELP = `slopsieve ${VERSION} - score a diff/PR for AI-slop review signals
 
