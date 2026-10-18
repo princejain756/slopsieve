@@ -105,7 +105,9 @@ if (pr) {
     process.exit(2);
   }
 } else if (!process.stdin.isTTY) {
-  diffText = readFileSync(0, "utf8");
+  const chunks = [];
+  for await (const chunk of process.stdin) chunks.push(chunk);
+  diffText = Buffer.concat(chunks).toString("utf8");
 } else {
   console.error(HELP);
   process.exit(2);

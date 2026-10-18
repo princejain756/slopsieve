@@ -296,6 +296,10 @@ assert.ok(j.flags.length >= 5);
 const gh = execFileSync("node", [bin, "fixtures/slop.patch", "--format", "github", "--fail-at", "0"], { cwd: root, encoding: "utf8" });
 assert.match(gh, /::warning file=tests\/cart\.test\.js,line=\d+,title=test-weakening/);
 
+// stdin pipe: `cat fixture | slopsieve` must not EAGAIN on non-blocking fds
+const stdinOut = execFileSync("node", [bin, "--no-color", "--fail-at", "0"], { cwd: root, encoding: "utf8", input: readFileSync(join(root, "fixtures", "slop.patch"), "utf8") }).toString();
+assert.match(stdinOut, /SLOP SCORE: \d+\/100/, "piped stdin should score the diff");
+
 // phantom-imports: fixture importing a nonexistent relative file
 const phantom = `diff --git a/src/x.js b/src/x.js
 index 1..2 100644
