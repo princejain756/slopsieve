@@ -31,13 +31,14 @@ export function textReport(r, target, version, useColor = true) {
 
 // ::warning annotations pin each flag onto the PR "Files changed" line.
 export function githubReport(r) {
+  const escProp = (s) => String(s ?? "").replace(/%/g, "%25").replace(/\r/g, "%0D").replace(/\n/g, "%0A").replace(/:/g, "%3A").replace(/,/g, "%2C");
+  const escData = (s) => String(s ?? "").replace(/%/g, "%25").replace(/\r/g, "%0D").replace(/\n/g, "%0A");
   const lines = [];
   for (const f of r.flags)
     for (const e of f.evidence) {
       const m = e.match(/^(.+?):(\d+)/);
-      const esc = (s) => s.replace(/%/g, "%25").replace(/\r/g, "%0D").replace(/\n/g, "%0A").replace(/:/g, "%3A").replace(/,/g, "%2C");
-      if (m) lines.push(`::warning file=${m[1]},line=${m[2]},title=${f.id}::${esc(f.title)} - ${esc(e.slice(m[0].length).trim())}`);
-      else lines.push(`::warning title=${f.id}::${esc(f.title)} - ${esc(e)}`);
+      if (m) lines.push(`::warning file=${escProp(m[1])},line=${m[2]},title=${escProp(f.id)}::${escData(f.title)} - ${escData(e.slice(m[0].length).trim())}`);
+      else lines.push(`::warning title=${escProp(f.id)}::${escData(f.title)} - ${escData(e)}`);
     }
   lines.push(`::notice title=slopsieve::score ${r.score}/100 - ${r.band}`);
   return lines.join("\n");
@@ -45,4 +46,72 @@ export function githubReport(r) {
 
 export function jsonReport(r, target, version) {
   return JSON.stringify({ tool: "slopsieve", version, target, ...r }, null, 2);
+}
+
+export function sarifReport(r, target, version) {
+  const rules = r.flags.map((f) => ({
+    id: f.id,
+    shortDescription: { text: f.title },
+    defaultConfiguration: { level: f.weight >= 25 ? "error" : "warning" },
+    properties: { weight: f.weight }
+  }));
+  const results = [];
+  for (const f of r.flags) {
+    const level = f.weight >= 25 ? "error" : "warning";
+    if (!f.evidence || f.evidence.length === 0) {
+      results.push({
+        ruleId: f.id,
+        level,
+        message: { text: `${f.title}${f.detail ? ` (${f.detail})` : ""}` },
+        locations: [{ physicalLocation: { artifactLocation: { uri: "diff" } } }]
+      });
+      continue;
+    }
+    for (const e of f.evidence) {
+      const m = e.match(/^(.+?):(\d+)/);
+      const snippet = m ? e.slice(m[0].length).trim() : e;
+      const loc = m
+        ? {
+            physicalLocation: {
+              artifactLocation: { uri: m[1] },
+              region: { startLine: Math.max(1, Number(m[2])) }
+            }
+          }
+        : { physicalLocation: { artifactLocation: { uri: "diff" } } };
+      results.push({
+        ruleId: f.id,
+        level,
+        message: { text: `${f.title}${snippet ? ` - ${snippet}` : ""}` },
+        locations: [loc]
+      });
+    }
+  }
+  return JSON.stringify(
+    {
+      $schema: "https://json.schemastore.org/sarif-2.1.0.json",
+      version: "2.1.0",
+      runs: [
+        {
+          tool: {
+            driver: {
+              name: "slopsieve",
+              version,
+              informationUri: "https://github.com/princejain756/slopsieve",
+              rules
+            }
+          },
+          properties: {
+            target,
+            score: r.score,
+            band: r.band,
+            verdict: r.verdict,
+            totals: r.totals
+          },
+          results
+        }
+      ]
+    },
+    null,
+    2
+  );
 }

@@ -295,6 +295,16 @@ assert.ok(j.flags.length >= 5);
 
 const gh = execFileSync("node", [bin, "fixtures/slop.patch", "--format", "github", "--fail-at", "0"], { cwd: root, encoding: "utf8" });
 assert.match(gh, /::warning file=tests\/cart\.test\.js,line=\d+,title=test-weakening/);
+assert.ok(!gh.includes("%3A") && !gh.includes("%2C"), "github message body must not percent-encode colons or commas");
+
+const sarif = JSON.parse(execFileSync("node", [bin, "fixtures/slop.patch", "--format=sarif", "--fail-at=0"], { cwd: root, encoding: "utf8" }));
+assert.equal(sarif.version, "2.1.0");
+assert.ok(sarif.runs?.[0]?.results?.length >= 5, "SARIF report has results");
+assert.ok(sarif.runs[0].results.some((r) => r.locations?.[0]?.physicalLocation?.region?.startLine > 0), "SARIF locations carry startLine");
+
+let badFmtCode = 0;
+try { execFileSync("node", [bin, "fixtures/clean.patch", "--format", "xml"], { cwd: root }); } catch (e) { badFmtCode = e.status; }
+assert.equal(badFmtCode, 2, "invalid --format must exit 2");
 
 // stdin pipe: `cat fixture | slopsieve` must not EAGAIN on non-blocking fds
 const stdinOut = execFileSync("node", [bin, "--no-color", "--fail-at", "0"], { cwd: root, encoding: "utf8", input: readFileSync(join(root, "fixtures", "slop.patch"), "utf8") }).toString();

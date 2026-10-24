@@ -5,7 +5,7 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseDiff } from "../src/parse.js";
 import { analyze } from "../src/checks.js";
-import { textReport, jsonReport, githubReport } from "../src/report.js";
+import { textReport, jsonReport, githubReport, sarifReport } from "../src/report.js";
 
 const VERSION = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), "..", "package.json"), "utf8")).version;
 
@@ -20,8 +20,8 @@ usage:
   git diff | slopsieve               score stdin
 
 flags:
-  --json            machine-readable report
-  --format github   ::warning annotations for Actions PR annotations
+  --json            machine-readable report (shorthand for --format json)
+  --format <fmt>    output format: text (default), json, github, sarif
   --fail-at <N>     exit 1 when score >= N (default 50, use 0 to never fail)
   --no-color        plain output
   --config <path>   config file (default: .slopsieverc.json if present)
@@ -41,29 +41,40 @@ if (args.includes("-h") || args.includes("--help")) { console.log(HELP); process
 if (args.includes("-v") || args.includes("--version")) { console.log(VERSION); process.exit(0); }
 
 const idx = (name) => args.indexOf(name);
-const json = args.includes("--json");
-const ghFmt = idx("--format") !== -1 && args[idx("--format") + 1] === "github";
+const hasFlag = (name) => idx(name) !== -1 || args.some((a) => a.startsWith(`${name}=`));
+const val = (name) => {
+  const eq = args.find((a) => a.startsWith(`${name}=`));
+  if (eq !== undefined) return eq.slice(name.length + 1);
+  return idx(name) !== -1 ? args[idx(name) + 1] : undefined;
+};
+const VALID_FORMATS = new Set(["text", "json", "github", "sarif"]);
+const rawFormat = hasFlag("--format") ? val("--format") : args.includes("--json") ? "json" : "text";
+if (!VALID_FORMATS.has(rawFormat)) {
+  console.error(`slopsieve: --format must be one of ${Array.from(VALID_FORMATS).join(", ")}`);
+  process.exit(2);
+}
 const color = !args.includes("--no-color") && process.stdout.isTTY !== false;
 
-const failIdx = idx("--fail-at");
-let failAt = failIdx === -1 ? 50 : Number(args[failIdx + 1]);
-if (failIdx !== -1 && Number.isNaN(failAt)) {
+const failPresent = hasFlag("--fail-at");
+const failRaw = val("--fail-at");
+let failAt = !failPresent ? 50 : Number(failRaw);
+if (failPresent && (failRaw === undefined || failRaw.trim() === "" || Number.isNaN(failAt))) {
   console.error("slopsieve: --fail-at requires a number");
   process.exit(2);
 }
 
-const cfgIdx = idx("--config");
-const cfgPath = cfgIdx !== -1 ? args[cfgIdx + 1] : existsSync(".slopsieverc.json") ? ".slopsieverc.json" : null;
+const cfgRaw = val("--config");
+const cfgPath = cfgRaw !== undefined ? cfgRaw : existsSync(".slopsieverc.json") ? ".slopsieverc.json" : null;
 let cfg = {};
 if (cfgPath) {
   try { cfg = JSON.parse(readFileSync(cfgPath, "utf8")); }
   catch { console.error(`slopsieve: cannot parse ${cfgPath}`); process.exit(2); }
 }
-if (failIdx === -1 && typeof cfg.failAt === "number") failAt = cfg.failAt;
+if (failRaw === undefined && typeof cfg.failAt === "number") failAt = cfg.failAt;
 const opts = { disabled: cfg.disabled || [], weights: cfg.weights || {}, cwd: process.cwd() };
 
 const consumed = new Set();
-for (const i of [failIdx, idx("--format"), cfgIdx]) if (i >= 0) { consumed.add(i); consumed.add(i + 1); }
+for (const i of [idx("--fail-at"), idx("--format"), idx("--config")]) if (i >= 0) { consumed.add(i); consumed.add(i + 1); }
 const target = args.find((a, i) => !a.startsWith("-") && !consumed.has(i));
 
 function sh(bin_, args_, silent) {
@@ -125,5 +136,13 @@ if (!files.length) {
   process.exit(2);
 }
 const result = analyze(files, prMeta, opts);
-console.log(ghFmt ? githubReport(result) : json ? jsonReport(result, label, VERSION) : textReport(result, label, VERSION, color));
+const out =
+  rawFormat === "github"
+    ? githubReport(result)
+    : rawFormat === "sarif"
+      ? sarifReport(result, label, VERSION)
+      : rawFormat === "json"
+        ? jsonReport(result, label, VERSION)
+        : textReport(result, label, VERSION, color);
+console.log(out);
 process.exit(failAt > 0 && result.score >= failAt ? 1 : 0);
